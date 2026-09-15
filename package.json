@@ -1,0 +1,13 @@
+{
+    "name": "evm-tx-safety",
+    "private": true,
+    "workspaces": [
+        "packages/*",
+        "apps/*"
+    ],
+    "scripts": {
+        "dev": "npm run dev --workspace=apps/web",
+        "build": "npm run build --workspace=packages/core && npm run build --workspace=apps/web",
+        "lint": "npm run lint --workspace=apps/web"
+    }
+}

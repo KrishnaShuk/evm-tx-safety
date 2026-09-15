@@ -1,0 +1,19 @@
+{
+    "name": "@evm-safety/core",
+    "version": "1.0.0",
+    "description": "EVM transaction decoder, simulator, and safety checker",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "dev": "tsc --watch"
+    },
+    "dependencies": {
+        "ethers": "^6.13.0",
+        "axios": "^1.7.0"
+    },
+    "devDependencies": {
+        "typescript": "^5.7.0",
+        "@types/node": "^22.0.0"
+    }
+}

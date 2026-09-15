@@ -1,0 +1,22 @@
+{
+    "name": "@evm-safety/cli",
+    "version": "1.0.0",
+    "private": true,
+    "bin": {
+        "evm-safety": "./dist/index.js"
+    },
+    "scripts": {
+        "build": "tsc",
+        "dev": "tsc --watch"
+    },
+    "dependencies": {
+        "@evm-safety/core": "*",
+        "chalk": "4.1.2",
+        "commander": "^12.1.0",
+        "ora": "5.4.1"
+    },
+    "devDependencies": {
+        "typescript": "^5.7.0",
+        "@types/node": "^22.0.0"
+    }
+}
