@@ -1,0 +1,216 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[a4paper,margin=1.6cm]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{caption}
+
+\definecolor{ours}{RGB}{22,128,61}
+\definecolor{hdr}{RGB}{28,52,96}
+\definecolor{part}{RGB}{176,102,0}
+
+\newcommand{\FYes}{\cellcolor{green!18}\textcolor{green!45!black}{\checkmark}}
+\newcommand{\FPart}{\cellcolor{orange!22}\textcolor{part}{\textasciitilde}}
+\newcommand{\FNo}{\cellcolor{red!14}\textcolor{red!70!black}{--}}
+\newcommand{\FNa}{\cellcolor{gray!12}\textcolor{gray}{--}}
+\newcommand{\LYes}{\textcolor{green!45!black}{\checkmark}}
+\newcommand{\LPart}{\textcolor{part}{\textasciitilde}}
+\newcommand{\LNo}{\textcolor{red!70!black}{--}}
+\newcommand{\LNa}{\textcolor{gray}{--}}
+
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+\captionsetup{font=small,labelfont=bf}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!50!black,
+    urlcolor=blue!55!black,
+    pdftitle={EVM TX Safety v0.6 -- Visual Feature Comparison},
+    pdfauthor={EVM TX Safety}
+}
+
+\title{\textbf{EVM TX Safety v0.6}\\[3pt]
+\large Visual Feature Comparison}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\noindent
+\small
+\textbf{How to read:} each table is a like-for-like capability view against
+publicly documented behavior. This is not a detection-accuracy benchmark.
+\quad
+\LYes{} supported \quad
+\LPart{} partial / optional \quad
+\LNo{} not documented \quad
+\LNa{} unavailable / undocumented
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section*{1. Inputs and decoding}
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.45}
+\small
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{5.2cm} *{5}{C}}
+\toprule
+\rowcolor{hdr}
+\textcolor{white}{\textbf{Capability}} &
+\cellcolor{ours}\textcolor{white}{\textbf{EVM TX Safety}} &
+\textcolor{white}{\textbf{Tenderly}} &
+\textcolor{white}{\textbf{Blockaid}} &
+\textcolor{white}{\textbf{Rabby}} &
+\textcolor{white}{\textbf{\shortstack{Foundry /\\Cast}}} \\
+\midrule
+Transaction-hash input              &\FYes &\FYes &\FYes &\FPart &\FYes \\
+Signed hex input                    &\FYes &\FYes &\FYes &\FNo &\FYes \\
+Raw calldata + target               &\FYes &\FYes &\FYes &\FPart &\FYes \\
+Structured object input             &\FYes &\FPart &\FPart &\FNo &\FNo \\
+Verified ABI + proxy resolution     &\FYes &\FYes &\FYes &\FPart &\FPart \\
+Nested calls (multicall / router)   &\FYes &\FYes &\FYes &\FYes &\FPart \\
+Signature-confidence labelling      &\FYes &\FNo &\FNo &\FNo &\FNo \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\noindent\small\textbf{Takeaway:} ours is the only column with every input form
+\emph{and} a confidence label on the decode.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section*{2. Simulation output}
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.45}
+\small
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{5.2cm} *{5}{C}}
+\toprule
+\rowcolor{hdr}
+\textcolor{white}{\textbf{Capability}} &
+\cellcolor{ours}\textcolor{white}{\textbf{EVM TX Safety}} &
+\textcolor{white}{\textbf{Tenderly}} &
+\textcolor{white}{\textbf{Blockaid}} &
+\textcolor{white}{\textbf{Rabby}} &
+\textcolor{white}{\textbf{\shortstack{Foundry /\\Cast}}} \\
+\midrule
+State-aware simulation              &\FYes &\FYes &\FYes &\FYes &\FYes \\
+ETH / token balance changes         &\FYes &\FYes &\FYes &\FYes &\FPart \\
+Approval changes                    &\FYes &\FPart &\FPart &\FYes &\FPart \\
+Storage / state changes             &\FYes &\FYes &\FPart &\FPart &\FPart \\
+Local trace backend                 &\FYes &\FNo &\FNo &\FNo &\FYes \\
+RPC-only fallback                   &\FYes &\FNo &\FNo &\FYes &\FYes \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\noindent\small\textbf{Takeaway:} ours is the only column that pairs trace and
+RPC simulation with a decoded, scored transaction and explicit coverage.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section*{3. Safety rules}
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.45}
+\small
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{5.0cm} *{6}{C}}
+\toprule
+\rowcolor{hdr}
+\textcolor{white}{\textbf{Capability}} &
+\cellcolor{ours}\textcolor{white}{\textbf{EVM TX Safety}} &
+\textcolor{white}{\textbf{Blockaid}} &
+\textcolor{white}{\textbf{Rabby}} &
+\textcolor{white}{\textbf{\shortstack{Pocket\\Universe}}} &
+\textcolor{white}{\textbf{\shortstack{Fire /\\Wallet Guard}}} &
+\textcolor{white}{\textbf{\shortstack{Revoke\\cash}}} \\
+\midrule
+Pre-sign risk verdict                    &\FYes &\FYes &\FYes &\FYes &\FYes &\FPart \\
+Unlimited ERC-20 approval                &\FYes &\FYes &\FYes &\FYes &\FYes &\FYes \\
+Unknown or EOA spender                   &\FYes &\FYes &\FYes &\FYes &\FYes &\FPart \\
+\texttt{setApprovalForAll} allowlist     &\FYes &\FYes &\FYes &\FYes &\FYes &\FYes \\
+Hidden approval inside a call            &\FYes &\FYes &\FYes &\FYes &\FYes &\FNo \\
+Transfer to unknown contract             &\FYes &\FYes &\FYes &\FYes &\FYes &\FNo \\
+Evidence attached to each warning        &\FYes &\FPart &\FPart &\FPart &\FPart &\FPart \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\noindent\small\textbf{Takeaway:} only ours covers all seven checks; only ours
+attaches machine-readable evidence to every warning.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section*{4. Delivery and openness}
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.45}
+\small
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{5.0cm} *{6}{C}}
+\toprule
+\rowcolor{hdr}
+\textcolor{white}{\textbf{Capability}} &
+\cellcolor{ours}\textcolor{white}{\textbf{EVM TX Safety}} &
+\textcolor{white}{\textbf{Tenderly}} &
+\textcolor{white}{\textbf{Blockaid}} &
+\textcolor{white}{\textbf{Rabby}} &
+\textcolor{white}{\textbf{\shortstack{Foundry /\\Cast}}} &
+\textcolor{white}{\textbf{\shortstack{Revoke\\cash}}} \\
+\midrule
+Web interface                       &\FYes &\FYes &\FPart &\FPart &\FNo &\FYes \\
+Command-line interface              &\FYes &\FPart &\FNo &\FNo &\FYes &\FNo \\
+HTTP API                            &\FYes &\FYes &\FYes &\FNo &\FNo &\FNo \\
+Open source                         &\FYes &\FNo &\FNo &\FYes &\FYes &\FYes \\
+Self-hostable end to end            &\FYes &\FNo &\FNo &\FPart &\FYes &\FYes \\
+No vendor account required          &\FYes &\FNo &\FNo &\FYes &\FYes &\FYes \\
+Automated tests / CI                &\FYes &\FNa &\FNa &\FPart &\FYes &\FPart \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\noindent\small\textbf{Takeaway:} ours is the only column with web + CLI + API +
+open source + self-hosting + no vendor account.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section*{5. Best fit by workflow}
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.4}
+\small
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{7.2cm} >{\raggedright\arraybackslash}X}
+\toprule
+\rowcolor{hdr}
+\textcolor{white}{\textbf{If you need\ldots}} &
+\textcolor{white}{\textbf{Use}} \\
+\midrule
+Self-hosted pre-sign gate from web, shell, or API
+    &\cellcolor{green!18}\textbf{EVM TX Safety} \\
+Wallet-embedded consumer protection
+    & Rabby, Pocket Universe, or Fire / Wallet Guard \\
+Threat-intelligence API at wallet scale
+    & Blockaid \\
+Deep debugging and state overrides
+    & Tenderly \\
+Fork testing and scripting
+    & Foundry / Cast \\
+Static contract audit
+    & Slither \\
+Finding and revoking old approvals
+    & Revoke.cash \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\vfill
+\noindent\footnotesize
+\textbf{Sources:} EVM TX Safety repository (\texttt{README.md},
+\texttt{packages/core}); Tenderly Simulations; Blockaid Platform; Rabby;
+Pocket Universe; Fire / Wallet Guard; Foundry Cast; Slither; Revoke.cash.
+Capabilities reflect public documentation as of \today.
+
+\end{document}

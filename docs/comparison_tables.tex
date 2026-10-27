@@ -1,0 +1,189 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[a4paper,margin=1.6cm]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage[table]{xcolor}
+\usepackage{colortbl}
+\usepackage{pifont}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{caption}
+
+\definecolor{ourshade}{green!7}
+\definecolor{part}{RGB}{176,102,0}
+
+\newcommand{\Yes}{\textcolor{green!45!black}{\ding{51}}}
+\newcommand{\No}{\textcolor{red!70!black}{\ding{55}}}
+\newcommand{\Partial}{\textcolor{part}{\textbf{\textasciitilde}}}
+\newcommand{\ND}{\textcolor{gray}{\textsf{N/D}}}
+
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+\newcolumntype{G}{>{\columncolor{ourshade}\centering\arraybackslash}X}
+
+\captionsetup{font=small,labelfont=bf}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!50!black,
+    urlcolor=blue!55!black,
+    pdftitle={EVM TX Safety --- Comparison Tables},
+    pdfauthor={EVM TX Safety}
+}
+
+\title{\textbf{EVM TX Safety v0.6}\\[3pt]
+\large Comparison Tables for the Final-Year Report}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\noindent\small
+\textbf{Legend.}\quad
+\Yes{} Yes \quad
+\No{} No \quad
+\Partial{} Partial \quad
+\ND{} Not documented (N/D; means the source does not describe it, not necessarily that the feature is absent).\\[2pt]
+\textbf{Checked:} 23 October 2026. Competitor cells are based only on official documentation,
+official repositories, or public package metadata. The EVM TX Safety column is verified
+against the implementation in this repository.
+
+% =====================================================================
+% BEGIN COPY-PASTE BLOCK: four comparison tables
+% Required preamble: booktabs, array, tabularx, xcolor (table), colortbl,
+% pifont, amssymb; macros \Yes, \No, \Partial, \ND, column types Y and G.
+% =====================================================================
+
+% ─────────────────────────────────────────────────────────────────────
+\section*{1. Understanding the transaction}
+
+\begin{table}[htbp]
+\centering
+\caption{Decoding and explanation capabilities.}
+\label{tab:understanding}
+\footnotesize
+\renewcommand{\arraystretch}{1.45}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{4.3cm} *{5}{Y} G}
+\toprule
+\textbf{Capability} &
+\textbf{Etherscan} &
+\textbf{Tenderly} &
+\textbf{\shortstack{Loop\\Decoder}} &
+\textbf{TxExplain} &
+\textbf{Rabby} &
+\cellcolor{green!18}\textbf{\shortstack{EVM TX\\Safety (ours)}} \\
+\midrule
+Decodes raw calldata into readable form
+    & \Yes & \Yes & \Yes & \Yes & \Yes & \Yes \\
+Decodes nested calls (multicall, swap routers)
+    & \ND & \Yes & \Yes & \ND & \ND & \Yes\ (Permit2 partial) \\
+Plain-language summary of the action
+    & \ND & \ND & \Partial\ (experimental) & \Yes & \Yes & \Yes \\
+Handles unverified or unknown contracts
+    & \Partial\ (similar match) & \ND & \Yes & \Partial\ (risk flag) & \ND & \Yes\ (offline confidence) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% ─────────────────────────────────────────────────────────────────────
+\section*{2. Simulation}
+
+\begin{table}[htbp]
+\centering
+\caption{Pre-execution simulation and value changes.}
+\label{tab:simulation}
+\footnotesize
+\renewcommand{\arraystretch}{1.45}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{4.3cm} *{5}{Y} G}
+\toprule
+\textbf{Capability} &
+\textbf{Etherscan} &
+\textbf{Tenderly} &
+\textbf{\shortstack{Loop\\Decoder}} &
+\textbf{TxExplain} &
+\textbf{Rabby} &
+\cellcolor{green!18}\textbf{\shortstack{EVM TX\\Safety (ours)}} \\
+\midrule
+Simulates before sending (success or revert)
+    & \ND & \Yes & \No & \No & \ND & \Yes \\
+Shows token and balance changes
+    & \ND & \Yes\ (ERC-20/721) & \No & \ND & \ND & \Partial\ (needs trace/Tenderly) \\
+Shows gas estimate
+    & \ND & \Yes & \No & \Partial\ (gas used) & \Yes & \Yes \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% ─────────────────────────────────────────────────────────────────────
+\section*{3. Safety}
+
+\begin{table}[htbp]
+\centering
+\caption{Safety warnings and approval checks.}
+\label{tab:safety}
+\footnotesize
+\renewcommand{\arraystretch}{1.45}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{4.3cm} *{5}{Y} G}
+\toprule
+\textbf{Capability} &
+\textbf{Etherscan} &
+\textbf{Tenderly} &
+\textbf{\shortstack{Loop\\Decoder}} &
+\textbf{TxExplain} &
+\textbf{Rabby} &
+\cellcolor{green!18}\textbf{\shortstack{EVM TX\\Safety (ours)}} \\
+\midrule
+Gives safety warnings or a risk score
+    & \ND & \ND & \No & \Yes & \Yes & \Yes \\
+Flags unlimited or risky approvals
+    & \ND & \ND & \No & \Yes & \Yes & \Yes \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% ─────────────────────────────────────────────────────────────────────
+\section*{4. Practical use}
+
+\begin{table}[htbp]
+\centering
+\caption{Inputs, interfaces, licensing, access, and chain coverage.}
+\label{tab:practical}
+\footnotesize
+\renewcommand{\arraystretch}{1.45}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{4.3cm} *{5}{Y} G}
+\toprule
+\textbf{Capability} &
+\textbf{Etherscan} &
+\textbf{Tenderly} &
+\textbf{\shortstack{Loop\\Decoder}} &
+\textbf{TxExplain} &
+\textbf{Rabby} &
+\cellcolor{green!18}\textbf{\shortstack{EVM TX\\Safety (ours)}} \\
+\midrule
+Input types (tx hash, raw calldata, signed transaction)
+    & \Partial\ (hash) & \Partial\ (tx object) & \Partial\ (hash/calldata) & \Partial\ (hash only) & \ND & \Yes \\
+Interfaces (web, CLI, API)
+    & \Partial\ (web/API) & \Partial\ (web/API/SDK) & \Partial\ (library/playground) & \Partial\ (web) & \Partial\ (extension) & \Yes \\
+Open source and self-hostable
+    & \No & \No & \Yes & \Yes & \Yes\ (MIT build) & \Yes \\
+Free to use, no account required
+    & \Partial\ (free web; API key) & \Partial\ (account) & \Partial\ (ABI key) & \Partial\ (read-only demo) & \Yes & \Yes \\
+Number of supported chains
+    & 60+ & 96 & Any EVM & 1 (Arbitrum) & All EVM & 6 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% =====================================================================
+% END COPY-PASTE BLOCK
+% =====================================================================
+
+\vfill
+\noindent\footnotesize
+\textbf{Sources and verification:} see \texttt{docs/comparison\_sources.md}. The EVM TX
+Safety column is verified against the code, not the README. Known limits reflected above:
+balance/approval/state diffs require Tenderly or a trace-capable RPC; RPC-only mode has no
+diffs; Universal Router Permit2 internals are only partially decoded; Sourcify/OpenChain/4byte
+failures reduce decode confidence; the safety rules are heuristics, not ML or threat intelligence.
+
+\end{document}

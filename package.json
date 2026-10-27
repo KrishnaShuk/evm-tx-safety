@@ -1,13 +1,16 @@
 {
     "name": "evm-tx-safety",
+    "version": "0.6.0",
     "private": true,
     "workspaces": [
         "packages/*",
         "apps/*"
     ],
     "scripts": {
-        "dev": "npm run dev --workspace=apps/web",
-        "build": "npm run build --workspace=packages/core && npm run build --workspace=apps/web",
-        "lint": "npm run lint --workspace=apps/web"
+        "dev": "npm run build --workspace=packages/core && npm run dev --workspace=apps/web",
+        "build": "npm run build --workspace=packages/core && npm run build --workspace=apps/cli && npm run build --workspace=apps/web",
+        "lint": "npm run lint --workspace=apps/web",
+        "typecheck": "npm run typecheck --workspace=packages/core && npm run typecheck --workspace=apps/web",
+        "test": "npm test --workspace=packages/core"
     }
 }

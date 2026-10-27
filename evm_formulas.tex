@@ -1,0 +1,144 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\title{EVM Transaction Safety --- Mathematical Formulas}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Gas Margin Ratio}
+
+A transaction~\(T\) is flagged as \texttt{GAS\_LIMIT\_TOO\_LOW} when the ratio
+of the user-supplied gas limit to the simulated gas consumed falls below 1.1:
+
+\begin{equation}
+  \text{GasMargin}(T) = \frac{G_{\text{limit}}}{G_{\text{used}}}
+\end{equation}
+
+\begin{equation}
+  \text{flag}(T) =
+  \begin{cases}
+    \texttt{GAS\_LIMIT\_TOO\_LOW} & \text{if } \dfrac{G_{\text{limit}}}{G_{\text{used}}} < 1.1 \\[8pt]
+    \texttt{OK}                   & \text{otherwise}
+  \end{cases}
+\end{equation}
+
+The recommended safe threshold is \(\text{GasMargin} \geq 1.2\).
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Gas Utilization Percentage}
+
+The percentage of the gas allowance consumed during simulation is:
+
+\begin{equation}
+  G_{\%}(T) = \left\lfloor \frac{G_{\text{used}}}{G_{\text{limit}}} \times 100 \right\rfloor
+\end{equation}
+
+where \(G_{\text{used}}\) is the gas consumed and \(G_{\text{limit}}\) is the
+cap provided by the sender.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Token Amount Normalisation}
+
+ERC-20 balances are stored as unsigned integers on-chain. The human-readable
+amount is recovered as:
+
+\begin{equation}
+  A_{\text{human}} = \frac{A_{\text{raw}}}{10^{d}}, \quad d \in \{0, 1, \ldots, 18\}
+\end{equation}
+
+where \(A_{\text{raw}} \in \mathbb{Z}_{\geq 0}\) is the on-chain integer value
+and \(d\) is the token's \texttt{decimals()} value (default 18).
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Unlimited Approval Detection}
+
+An ERC-20 \texttt{approve(spender, amount)} call is classified as an unlimited
+approval when the approved amount equals \texttt{MAX\_UINT256}:
+
+\begin{equation}
+  \text{isUnlimited}(A) =
+  \begin{cases}
+    1 & \text{if } A = 2^{256} - 1 \\
+    0 & \text{otherwise}
+  \end{cases}
+\end{equation}
+
+\noindent where \(2^{256} - 1 \approx 1.16 \times 10^{77}\).
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Composite Transaction Safety Score}
+
+Let \(\mathcal{W} = \{w_1, w_2, \ldots, w_n\}\) be the set of warnings emitted
+for transaction~\(T\), each carrying severity
+\(s_i \in \{\texttt{LOW},\, \texttt{MEDIUM},\, \texttt{HIGH}\}\).
+
+Define indicator functions:
+
+\begin{align}
+  \mathbb{1}_{\text{HIGH}}(\mathcal{W}) &=
+  \begin{cases}
+    1 & \exists\, w_i \in \mathcal{W} : s_i = \texttt{HIGH} \\
+    0 & \text{otherwise}
+  \end{cases} \\[6pt]
+  \mathbb{1}_{\text{MED}}(\mathcal{W}) &=
+  \begin{cases}
+    1 & \exists\, w_i \in \mathcal{W} : s_i = \texttt{MEDIUM} \\
+    0 & \text{otherwise}
+  \end{cases}
+\end{align}
+
+The composite safety score is:
+
+\begin{equation}
+  \text{Score}(T) =
+  \begin{cases}
+    \texttt{DANGEROUS} & \text{if } \mathbb{1}_{\text{HIGH}}(\mathcal{W}) = 1 \\[4pt]
+    \texttt{WARNINGS}  & \text{else if } \mathbb{1}_{\text{MED}}(\mathcal{W}) = 1 \\[4pt]
+    \texttt{SAFE}      & \text{otherwise } (|\mathcal{W}| = 0)
+  \end{cases}
+\end{equation}
+
+The binary pass/fail outcome is:
+
+\begin{equation}
+  \text{passed}(T) =
+  \begin{cases}
+    \text{true}  & |\mathcal{W}| = 0 \\
+    \text{false} & |\mathcal{W}| > 0
+  \end{cases}
+\end{equation}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Safety Rule Coverage}
+
+\begin{table}[h!]
+\centering
+\caption{Safety rules implemented in the checker module.}
+\begin{tabular}{llll}
+\toprule
+\textbf{Rule ID} & \textbf{Tx Type} & \textbf{Severity} & \textbf{Condition} \\
+\midrule
+\texttt{UNLIMITED\_APPROVAL}     & ERC-20 Approve  & HIGH   & \(A = 2^{256}-1\) \\
+\texttt{UNVERIFIED\_SPENDER}     & ERC-20 Approve  & MEDIUM & spender \(\notin \mathcal{S}_{\text{safe}}\) \\
+\texttt{TX\_WILL\_REVERT}        & Any             & HIGH   & \texttt{simulation.success} \(=\) false \\
+\texttt{HIGH\_VALUE\_TRANSFER}   & ETH Transfer    & MEDIUM & \(V_{\text{ETH}} \geq 1\) \\
+\texttt{ZERO\_ADDRESS\_TARGET}   & Any             & HIGH   & to \(=\) \texttt{0x000\ldots000} \\
+\texttt{GAS\_LIMIT\_TOO\_LOW}    & Any             & LOW    & \(G_{\text{limit}} / G_{\text{used}} < 1.1\) \\
+\texttt{SET\_APPROVAL\_FOR\_ALL} & ERC-721/1155    & HIGH   & \texttt{approved} \(=\) true \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent where \(\mathcal{S}_{\text{safe}}\) is the allow-list of audited
+protocol addresses (Uniswap V2/V3, 1inch~V5, Aave~V3, Balancer Vault,
+0x Exchange Proxy).
+
+\end{document}
