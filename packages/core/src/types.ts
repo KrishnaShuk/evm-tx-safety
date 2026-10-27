@@ -54,6 +54,12 @@ export interface NormalizedTx {
     txType?: number;
     raw?: string;
     txHash?: string;
+    /** Authoritative outcome for a mined transaction hash, from its receipt. */
+    mined?: {
+        status: "success" | "revert";
+        gasUsed: string;
+        blockNumber: number;
+    };
 }
 
 export interface DecodedParam {

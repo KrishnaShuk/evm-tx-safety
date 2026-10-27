@@ -85,6 +85,7 @@ async function fromHash(
             `Transaction belongs to chain ${txChainId}, but chain ${chainId} was selected.`
         );
     }
+    const mined = await readMinedOutcome(hash, provider);
     return {
         kind: "hash",
         to: tx.to ?? undefined,
@@ -97,7 +98,31 @@ async function fromHash(
         chainId: txChainId ?? chainId,
         txType: tx.type ?? undefined,
         txHash: hash,
+        mined,
     };
+}
+
+async function readMinedOutcome(
+    hash: string,
+    provider: Provider
+): Promise<NormalizedTx["mined"]> {
+    try {
+        const receipt = await withTimeout(
+            provider.getTransactionReceipt(hash),
+            8000,
+            "eth_getTransactionReceipt"
+        );
+        if (!receipt || receipt.status === null) return undefined;
+        return {
+            status: receipt.status === 1 ? "success" : "revert",
+            gasUsed: receipt.gasUsed.toString(),
+            blockNumber: receipt.blockNumber,
+        };
+    } catch {
+        // A pending transaction, or an RPC that does not serve receipts, is
+        // still analyzable; fall back to live simulation.
+        return undefined;
+    }
 }
 
 function fromRawTx(raw: string, chainId: number | undefined): NormalizedTx {

@@ -1,0 +1,108 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[a4paper,margin=1.7cm]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!50!black,
+    urlcolor=blue!55!black,
+    pdftitle={Test Cases for EVM TX Safety},
+    pdfauthor={EVM TX Safety}
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\renewcommand{\arraystretch}{1.18}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\title{\textbf{Test Cases for EVM TX Safety}}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+This section describes the test cases used to evaluate the core transaction-analysis pipeline of EVM TX Safety. The tests examine input normalization, transaction decoding, execution simulation, safety-rule evaluation, and failure handling. The primary objective is to verify that transaction data is interpreted consistently and that the system reports both potentially harmful actions and unavailable analysis results clearly.
+
+The current suite contains 28 automated tests, implemented with Node.js's built-in \texttt{node:test} framework. The tests are grouped into three files: \texttt{core.test.mjs} (17 cases), \texttt{integration.test.mjs} (5 cases), and \texttt{fundamental.test.mjs} (6 cases). Each test states an expected behavior and checks it through assertions against the built core package.
+
+\section{Test methodology}
+
+\subsection{Execution environment}
+
+The test command builds the TypeScript core package and then runs the JavaScript test files:
+
+\begin{verbatim}
+npm test
+\end{verbatim}
+
+The tests use Node.js assertions and locally constructed inputs. ABI-encoded calls are generated in the tests using the \texttt{ethers} library. Two JSON examples, \texttt{examples/safe\_tx.json} and \texttt{examples/dangerous\_tx.json}, provide reusable synthetic inputs for a simple ETH transfer and an unlimited USDC approval, respectively.
+
+Integration scenarios use local mock HTTP servers to emulate JSON-RPC providers and, where required, a Tenderly response. The mock servers return deterministic responses for methods such as \texttt{eth\_chainId}, \texttt{eth\_call}, \texttt{eth\_estimateGas}, \texttt{eth\_getCode}, and \texttt{debug\_traceCall}. This allows simulation success, reverts, fallback behavior, and trace-derived state to be tested without submitting transactions or depending on a live blockchain node. The suite uses known contract addresses in some inputs, but does not use mined transaction records; transaction examples are synthetic.
+
+\subsection{Test oracle and verdict semantics}
+
+Expected outcomes are checked through explicit assertions on decoded transaction types and parameters, simulation status and backend, safety warning identifiers and severities, and final verdicts. The safety verdicts used in the test suite are \texttt{SAFE}, \texttt{WARNINGS}, and \texttt{DANGEROUS}. A revert is expected to produce a high-severity warning, while an unavailable simulation is expected to produce a warning rather than being reported as a confirmed transaction revert.
+
+\section{Test-case catalogue}
+
+The 28 cases are grouped by their primary objective in Table~\ref{tab:test-cases}. The table summarizes the scenarios rather than repeating every assertion from the test code.
+
+\begin{table}[htbp]
+\centering
+\caption{Summary of automated test cases.}
+\label{tab:test-cases}
+\small
+\begin{tabularx}{\textwidth}{L{3.1cm} c X}
+\toprule
+\textbf{Test area} & \textbf{Cases} & \textbf{Scenarios covered} \\
+\midrule
+Input handling & 2 & Distinguish transaction hashes, calldata, and structured inputs; require a target address for raw calldata. \\
+Transaction decoding & 6 & Decode ETH transfers, ERC-20 and Permit2 approvals, nested Multicall3 calls, and Universal Router commands. \\
+Simulation & 7 & Exercise successful and reverting RPC simulations, trace and Tenderly results, event/state-diff parsing, and backend fallback. \\
+Safety evaluation & 9 & Check risky and allowlisted approvals, marketplace operators, hidden approvals, unknown-contract transfers, warning severity, and safe/dangerous verdicts. \\
+Robustness & 4 & Check unavailable simulation, revert handling, RPC chain mismatch, and RPC URL restrictions. \\
+\midrule
+\textbf{Total} & \textbf{28} & \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Together, these tests check the main stages of analysis: input handling, decoding, simulation, and safety scoring. They include both benign and risky transaction examples, and verify that unavailable simulation is distinguished from a confirmed revert.
+
+\section{Execution results}
+
+The test suite was run with \texttt{npm test --workspace=packages/core}. In the observed run, all 28 tests passed and none failed, were skipped, or were cancelled. The reported total runtime was approximately 2.3 seconds, including the core build and test execution. This is a result for the local test environment and should not be interpreted as a benchmark of transaction-analysis performance in production.
+
+\begin{table}[htbp]
+\centering
+\caption{Observed automated test execution result.}
+\label{tab:test-results}
+\begin{tabular}{lr}
+\toprule
+\textbf{Measure} & \textbf{Result} \\
+\midrule
+Tests passed & 28 \\
+Tests failed & 0 \\
+Tests skipped or cancelled & 0 \\
+Observed total runtime & approximately 2.3 seconds \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Coverage limitations}
+
+The suite provides deterministic functional and integration checks for the core package, but it does not constitute exhaustive verification of every supported behavior. In particular, the tests do not exercise the command-line interface, the HTTP API route, or the web user interface. The mock RPC environment also cannot establish behavior across the full range of real provider implementations, network conditions, or live contract state.
+
+Of the 15 implemented safety rules, direct test cases cover eight: \texttt{UNLIMITED\_APPROVAL}, \texttt{UNVERIFIED\_SPENDER}, \texttt{SET\_APPROVAL\_FOR\_ALL}, \texttt{HIDDEN\_APPROVAL}, \texttt{TRANSFER\_TO\_UNKNOWN\_CONTRACT}, \texttt{TX\_WILL\_REVERT}, \texttt{SIMULATION\_UNAVAILABLE}, and \texttt{GAS\_LIMIT\_TOO\_LOW}. The remaining seven rules---\texttt{APPROVAL\_TO\_EOA}, \texttt{UNEXPECTED\_TRANSFER}, \texttt{HIGH\_VALUE\_TRANSFER}, \texttt{ZERO\_ADDRESS\_TARGET}, \texttt{HIGH\_GAS\_LIMIT}, \texttt{HIGH\_GAS\_PRICE}, and \texttt{UNVERIFIED\_FUNCTION}---do not have dedicated direct tests in the current suite.
+
+External ABI and selector services (including Sourcify, OpenChain, and 4byte.directory) are not validated against live responses by these tests. The fixtures are synthetic and no recorded mined transaction is used. Consequently, the results demonstrate the tested implementation behavior under controlled inputs; they do not by themselves establish real-world detection accuracy or completeness.
+
+\end{document}

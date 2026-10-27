@@ -14,6 +14,12 @@ export interface SimulationRequest {
     gasLimitWei?: string;
     gasPriceWei?: string;
     nonce?: number;
+    /** Mined outcome from a transaction receipt; authoritative when present. */
+    mined?: {
+        status: "success" | "revert";
+        gasUsed: string;
+        blockNumber: number;
+    };
 }
 
 export interface TenderlyCredentials {
