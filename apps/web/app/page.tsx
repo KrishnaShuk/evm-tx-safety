@@ -3,11 +3,12 @@
 import { useCallback, useState } from "react";
 import type { AnalysisResult } from "@evm-safety/core";
 import { CHAINS } from "./lib/chains";
-import type { InputMode } from "./lib/types";
+import type { InputMode, TxFields } from "./lib/types";
 import { shortAddr } from "./lib/format";
 import { TopBar } from "./components/TopBar";
 import { NetworkStrip } from "./components/NetworkStrip";
 import { Panel } from "./components/Panel";
+import { InputPanel } from "./components/InputPanel";
 import { FunctionKeyBar } from "./components/FunctionKeyBar";
 import { CopyButton } from "./components/CopyButton";
 import { ScoreBadge } from "./components/ScoreBadge";
@@ -26,7 +27,7 @@ export default function Home() {
     const [mode, setMode] = useState<InputMode>("hash");
     const [txHash, setTxHash] = useState("");
     const [rawHex, setRawHex] = useState("");
-    const [fields, setFields] = useState({ to: "", from: "", data: "", value: "", gasLimit: "" });
+    const [fields, setFields] = useState<TxFields>({ to: "", from: "", data: "", value: "", gasLimit: "" });
     const [rpcUrl, setRpcUrl] = useState(CHAINS[0].rpc);
     const [tenderlyKey, setTenderlyKey] = useState("");
     const [chainId, setChainId] = useState(1);
@@ -134,183 +135,27 @@ export default function Home() {
 
                     {/* ── 01 TRANSACTION INPUT ── */}
                     <Panel num="01" title="Transaction Input" id="panel-input" className="panel-span-2">
-                        <div className="tabs">
-                            <button
-                                className={`tab ${mode === "hash" ? "active" : ""}`}
-                                onClick={() => setMode("hash")}
-                                id="tab-hash"
-                            >
-                                Tx Hash
-                            </button>
-                            <button
-                                className={`tab ${mode === "hex" ? "active" : ""}`}
-                                onClick={() => setMode("hex")}
-                                id="tab-hex"
-                            >
-                                Signed Hex
-                            </button>
-                            <button
-                                className={`tab ${mode === "fields" ? "active" : ""}`}
-                                onClick={() => setMode("fields")}
-                                id="tab-fields"
-                            >
-                                Calldata / Fields
-                            </button>
-                        </div>
-
-                        {mode === "hash" ? (
-                            <div className="form-group">
-                                <label className="form-label" htmlFor="tx-hash">
-                                    Transaction Hash
-                                    <span className="label-badge">on-chain</span>
-                                </label>
-                                <input
-                                    id="tx-hash"
-                                    className="form-input"
-                                    placeholder="0x9f1c…"
-                                    value={txHash}
-                                    onChange={e => setTxHash(e.target.value)}
-                                    data-first-field="true"
-                                />
-                                <p className="field-hint">
-                                    The transaction is fetched from the selected chain before decoding, then simulated.
-                                </p>
-                            </div>
-                        ) : mode === "hex" ? (
-                            <div className="form-group">
-                                <label className="form-label" htmlFor="raw-hex">
-                                    Signed Transaction Hex
-                                    <span className="label-badge">RLP-encoded</span>
-                                </label>
-                                <textarea
-                                    id="raw-hex"
-                                    className="form-textarea"
-                                    placeholder="0x02f87601808459682f00851176592e0082520894…"
-                                    value={rawHex}
-                                    onChange={e => setRawHex(e.target.value)}
-                                    data-first-field="true"
-                                />
-                            </div>
-                        ) : (
-                            <>
-                                <div className="form-grid">
-                                    <div className="form-group">
-                                        <label className="form-label" htmlFor="field-to">To Address</label>
-                                        <input
-                                            id="field-to"
-                                            className="form-input"
-                                            placeholder="0xA0b86991c6218b36c1d19D4a2e9Eb0cE…"
-                                            value={fields.to}
-                                            onChange={e => setFields({ ...fields, to: e.target.value })}
-                                            data-first-field="true"
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label className="form-label" htmlFor="field-from">From Address</label>
-                                        <input
-                                            id="field-from"
-                                            className="form-input"
-                                            placeholder="0xYourWallet…"
-                                            value={fields.from}
-                                            onChange={e => setFields({ ...fields, from: e.target.value })}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="form-group">
-                                    <label className="form-label" htmlFor="field-data">
-                                        Calldata
-                                        <span className="label-badge">hex</span>
-                                    </label>
-                                    <input
-                                        id="field-data"
-                                        className="form-input"
-                                        placeholder="0x095ea7b3…"
-                                        value={fields.data}
-                                        onChange={e => setFields({ ...fields, data: e.target.value })}
-                                    />
-                                </div>
-                                <div className="form-grid">
-                                    <div className="form-group">
-                                        <label className="form-label" htmlFor="field-value">
-                                            Value
-                                            <span className="label-badge">wei</span>
-                                        </label>
-                                        <input
-                                            id="field-value"
-                                            className="form-input"
-                                            placeholder="0"
-                                            value={fields.value}
-                                            onChange={e => setFields({ ...fields, value: e.target.value })}
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label className="form-label" htmlFor="field-gas">Gas Limit</label>
-                                        <input
-                                            id="field-gas"
-                                            className="form-input"
-                                            placeholder="200000"
-                                            value={fields.gasLimit}
-                                            onChange={e => setFields({ ...fields, gasLimit: e.target.value })}
-                                        />
-                                    </div>
-                                </div>
-                            </>
-                        )}
-
-                        <div className="form-grid">
-                            <div className="form-group">
-                                <label className="form-label" htmlFor="select-chain">Network</label>
-                                <select
-                                    id="select-chain"
-                                    className="form-select form-input"
-                                    value={chainId}
-                                    onChange={e => handleChainChange(Number(e.target.value))}
-                                >
-                                    {CHAINS.map(c => (
-                                        <option key={c.id} value={c.id}>{c.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <label className="form-label" htmlFor="rpc-url">
-                                    RPC URL
-                                    <span className="rpc-status-dot" aria-hidden="true" />
-                                </label>
-                                <input
-                                    id="rpc-url"
-                                    className="form-input"
-                                    value={rpcUrl}
-                                    onChange={e => setRpcUrl(e.target.value)}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="form-group">
-                            <label className="form-label" htmlFor="tenderly-key">
-                                Tenderly API Key
-                                <span className="label-badge">optional</span>
-                            </label>
-                            <input
-                                id="tenderly-key"
-                                className="form-input"
-                                type="password"
-                                placeholder="Enables Tenderly when the server has TENDERLY_ACCOUNT and TENDERLY_PROJECT"
-                                value={tenderlyKey}
-                                onChange={e => setTenderlyKey(e.target.value)}
-                            />
-                            <p className="field-hint">
-                                Without Tenderly, the analyzer tries a trace-capable RPC, then falls back to eth_call + gas estimation.
-                            </p>
-                        </div>
-
-                        <button
-                            className="btn btn-primary"
-                            id="analyze-btn"
-                            onClick={handleAnalyze}
-                            disabled={loading || !canAnalyze}
-                        >
-                            {loading ? "⏳ Analyzing…" : "🔍  Analyze Transaction"}
-                        </button>
+                        <InputPanel
+                            mode={mode}
+                            onModeChange={setMode}
+                            txHash={txHash}
+                            onTxHashChange={setTxHash}
+                            rawHex={rawHex}
+                            onRawHexChange={setRawHex}
+                            fields={fields}
+                            onFieldsChange={setFields}
+                            chains={CHAINS}
+                            chainId={chainId}
+                            onChainChange={handleChainChange}
+                            rpcUrl={rpcUrl}
+                            onRpcUrlChange={setRpcUrl}
+                            tenderlyKey={tenderlyKey}
+                            onTenderlyKeyChange={setTenderlyKey}
+                            loading={loading}
+                            canAnalyze={canAnalyze}
+                            onAnalyze={handleAnalyze}
+                            compact={!!result}
+                        />
                     </Panel>
 
                     {/* ── ERROR ── */}

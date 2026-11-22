@@ -522,6 +522,26 @@ a {
     line-height: 1.45;
 }
 
+.input-panel[data-compact="true"] .field-hint {
+    display: none;
+}
+
+.select-wrap {
+    position: relative;
+}
+
+.select-wrap .form-select {
+    padding-left: 28px;
+}
+
+.select-wrap .chain-dot {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
 /* ── BUTTONS ────────────────────────────────────────────────── */
 .btn {
     display: inline-flex;
