@@ -733,6 +733,9 @@ a {
 
 /* ── VERDICT ────────────────────────────────────────────────── */
 .verdict-state {
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
     font-size: 22px;
     font-weight: 600;
     line-height: 1.2;

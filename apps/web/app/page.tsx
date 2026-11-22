@@ -9,6 +9,7 @@ import { TopBar } from "./components/TopBar";
 import { NetworkStrip } from "./components/NetworkStrip";
 import { Panel } from "./components/Panel";
 import { InputPanel } from "./components/InputPanel";
+import { VerdictPanel } from "./components/VerdictPanel";
 import { FunctionKeyBar } from "./components/FunctionKeyBar";
 import { CopyButton } from "./components/CopyButton";
 import { ScoreBadge } from "./components/ScoreBadge";
@@ -181,6 +182,11 @@ export default function Home() {
                     {/* ── RESULTS ── */}
                     {result && !loading && (
                         <>
+                            {/* ── 02 VERDICT ── */}
+                            <Panel num="02" title="Verdict" id="panel-verdict" className="panel-span-2">
+                                <VerdictPanel result={result} />
+                            </Panel>
+
                             {/* ── 03 DECODED TRANSACTION ── */}
                             <Panel
                                 num="03"
