@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import type { AnalysisResult } from "@evm-safety/core";
+import { TriangleAlert } from "lucide-react";
 import { CHAINS } from "./lib/chains";
 import type { InputMode, TxFields } from "./lib/types";
 import { TopBar } from "./components/TopBar";
@@ -15,6 +16,8 @@ import { SafetyPanel } from "./components/SafetyPanel";
 import { CallTree } from "./components/CallTree";
 import { SimulationPanel } from "./components/SimulationPanel";
 import { ActivityPanel } from "./components/ActivityPanel";
+import { BackendLogPanel } from "./components/BackendLogPanel";
+import { RawDisclosure } from "./components/RawDisclosure";
 import { LoadingState } from "./components/LoadingState";
 
 /* ──────────────────────────────────────────── */
@@ -157,11 +160,16 @@ export default function Home() {
                     {/* ── ERROR ── */}
                     {error && !loading && (
                         <div className="panel-span-2">
-                            <div className="error-box">
-                                <span className="error-icon">⚠️</span>
-                                <div>
-                                    <p style={{ fontWeight: 700, color: "var(--neg)", marginBottom: 4 }}>Analysis Failed</p>
-                                    <p className="text-secondary">{error}</p>
+                            <div className="error-box" role="alert">
+                                <span className="error-icon" aria-hidden="true">
+                                    <TriangleAlert size={16} strokeWidth={1.5} />
+                                </span>
+                                <div className="error-content">
+                                    <p className="error-title">Analysis Failed</p>
+                                    <RawDisclosure
+                                        summary={<p className="error-sentence">{error}</p>}
+                                        raw={error}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -207,15 +215,6 @@ export default function Home() {
                                 right={<span className="badge badge-indigo">{result.simulation.backend}</span>}
                             >
                                 <SimulationPanel simulation={result.simulation} />
-
-                                {result.simulation.notes.length > 0 && (
-                                    <div>
-                                        <div className="section-label">Backend Notes</div>
-                                        {result.simulation.notes.map((note, i) => (
-                                            <p key={i} className="field-hint">— {note}</p>
-                                        ))}
-                                    </div>
-                                )}
                             </Panel>
 
                             {/* ── 06 BALANCES, APPROVALS, STATE, EVENTS ── */}
@@ -236,6 +235,11 @@ export default function Home() {
                             {/* ── 07 SAFETY REPORT ── */}
                             <Panel num="07" title="Safety Report" id="panel-safety">
                                 <SafetyPanel safety={result.safety} />
+                            </Panel>
+
+                            {/* ── 08 BACKEND LOG ── */}
+                            <Panel num="08" title="Backend Log" id="panel-backend" className="panel-span-2">
+                                <BackendLogPanel simulation={result.simulation} />
                             </Panel>
                         </>
                     )}

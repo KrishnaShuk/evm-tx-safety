@@ -1184,6 +1184,123 @@ a {
     flex-shrink: 0;
 }
 
+.error-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.error-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--neg);
+    margin-bottom: var(--s1);
+}
+
+.error-sentence {
+    color: var(--text);
+    font-size: 12px;
+    word-break: break-word;
+}
+
+/* ── RAW DISCLOSURE ─────────────────────────────────────────── */
+.raw-disclosure {
+    margin-top: var(--s1);
+}
+
+.raw-summary {
+    color: var(--text);
+    font-size: 12px;
+}
+
+.raw-details {
+    margin-top: var(--s1);
+}
+
+.raw-details summary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s1);
+    min-height: 44px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    list-style: none;
+}
+
+.raw-details summary::-webkit-details-marker {
+    display: none;
+}
+
+.raw-details summary::before {
+    content: "▸";
+    color: var(--accent);
+}
+
+.raw-details[open] summary::before {
+    content: "▾";
+}
+
+.raw-pre {
+    margin-top: var(--s1);
+    padding: var(--s2);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    overflow-x: auto;
+    font-family: inherit;
+    font-size: 10px;
+    line-height: 1.5;
+    color: var(--text-muted);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* ── BACKEND LOG ────────────────────────────────────────────── */
+.backend-log > summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s2);
+    min-height: 44px;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    list-style: none;
+}
+
+.backend-log > summary::-webkit-details-marker {
+    display: none;
+}
+
+.backend-log > summary::before {
+    content: "▸";
+    color: var(--accent);
+}
+
+.backend-log[open] > summary::before {
+    content: "▾";
+}
+
+.backend-log-body {
+    padding-top: var(--s2);
+}
+
+.backend-notes {
+    margin: 0 0 var(--s2);
+    padding-left: var(--s4);
+    color: var(--text-muted);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.backend-notes li {
+    margin-bottom: var(--s1);
+}
+
 /* ── MISC / UTILITIES ───────────────────────────────────────── */
 .section-label {
     font-size: 10px;
