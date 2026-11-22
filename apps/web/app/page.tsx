@@ -10,12 +10,10 @@ import { NetworkStrip } from "./components/NetworkStrip";
 import { Panel } from "./components/Panel";
 import { InputPanel } from "./components/InputPanel";
 import { VerdictPanel } from "./components/VerdictPanel";
+import { DecodedPanel } from "./components/DecodedPanel";
 import { FunctionKeyBar } from "./components/FunctionKeyBar";
-import { CopyButton } from "./components/CopyButton";
 import { ScoreBadge } from "./components/ScoreBadge";
 import { SeverityBadge } from "./components/SeverityBadge";
-import { TxTypeBadge } from "./components/TxTypeBadge";
-import { ConfidenceBadge } from "./components/ConfidenceBadge";
 import { CallTree } from "./components/CallTree";
 import { CapabilityChips } from "./components/CapabilityChips";
 import { GasBar } from "./components/GasBar";
@@ -36,7 +34,6 @@ export default function Home() {
     const [loadStep, setLoadStep] = useState(0);
     const [result, setResult] = useState<AnalysisResult | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const [showRaw, setShowRaw] = useState(false);
 
     const selectedChain = CHAINS.find(c => c.id === chainId) ?? CHAINS[0];
 
@@ -194,89 +191,15 @@ export default function Home() {
                                 id="panel-decoded"
                                 right={<span className="badge badge-cyan">{result.decoded.txTypeEIP}</span>}
                             >
-                                <div className="tx-summary">
-                                    <span className="tx-summary-label">What this does</span>
-                                    <p>{result.decoded.summary}</p>
-                                </div>
-
-                                <div className="flex items-center gap-2 flex-wrap">
-                                    <TxTypeBadge type={result.decoded.type} />
-                                    <ConfidenceBadge confidence={result.decoded.signatureConfidence} />
-                                    {result.decoded.contractName && (
-                                        <span className="text-secondary">— {result.decoded.contractName}</span>
-                                    )}
-                                    {result.decoded.txHash && (
-                                        <span className="tx-hash-chip" title={result.decoded.txHash}>
-                                            {shortAddr(result.decoded.txHash)} <CopyButton text={result.decoded.txHash} />
-                                        </span>
-                                    )}
-                                </div>
-
-                                {result.decoded.functionSignature && (
-                                    <div>
-                                        <div className="section-label">Function</div>
-                                        <div className="fn-sig">
-                                            <code>{result.decoded.functionSignature}</code>
-                                            <CopyButton text={result.decoded.functionSignature} />
-                                        </div>
-                                    </div>
-                                )}
-
-                                {result.decoded.params.length > 0 && (
-                                    <div>
-                                        <div className="section-label">Parameters</div>
-                                        <table className="params-table">
-                                            <thead>
-                                                <tr><th>Name</th><th>Type</th><th>Value</th></tr>
-                                            </thead>
-                                            <tbody>
-                                                {result.decoded.params.map((p, i) => (
-                                                    <tr key={i}>
-                                                        <td>{p.name}</td>
-                                                        <td>{p.type}</td>
-                                                        <td>
-                                                            {p.value.includes("MAX_UINT256") ? (
-                                                                <span className="max-uint-warn">
-                                                                    ⚠ {p.value}
-                                                                </span>
-                                                            ) : p.value}
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                )}
-
-                                {result.decoded.calls.some(call => (call.children?.length ?? 0) > 0) && (
-                                    <div>
-                                        <div className="section-label">Execution Path</div>
-                                        <CallTree calls={result.decoded.calls} />
-                                    </div>
-                                )}
-
-                                <div className="form-grid">
-                                    <div className="metric-pair">
-                                        <div className="metric-label">Value</div>
-                                        <div className="metric-val">{result.decoded.valueEth} ETH</div>
-                                    </div>
-                                    <div className="metric-pair">
-                                        <div className="metric-label">Gas Limit</div>
-                                        <div className="metric-val">{Number(result.decoded.gasLimit).toLocaleString()}</div>
-                                    </div>
-                                </div>
-
-                                {result.decoded.rawData && result.decoded.rawData !== "0x" && (
-                                    <div>
-                                        <button className="collapsible-toggle" onClick={() => setShowRaw(!showRaw)}>
-                                            {showRaw ? "▾" : "▸"} Raw Calldata
-                                        </button>
-                                        {showRaw && (
-                                            <div className="raw-data-box">{result.decoded.rawData}</div>
-                                        )}
-                                    </div>
-                                )}
+                                <DecodedPanel decoded={result.decoded} />
                             </Panel>
+
+                            {/* ── 04 EXECUTION PATH ── */}
+                            {result.decoded.calls.some(call => (call.children?.length ?? 0) > 0) && (
+                                <Panel num="04" title="Execution Path" id="panel-path">
+                                    <CallTree calls={result.decoded.calls} />
+                                </Panel>
+                            )}
 
                             {/* ── 05 SIMULATION RESULT ── */}
                             <Panel

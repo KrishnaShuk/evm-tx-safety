@@ -1365,6 +1365,22 @@ a {
     word-break: break-all;
 }
 
+.kv-v code {
+    color: var(--info);
+}
+
+.decoded-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s2);
+    margin-bottom: var(--s3);
+}
+
+.kv-list {
+    margin-bottom: var(--s3);
+}
+
 .tbl-wrap {
     overflow-x: auto;
 }
