@@ -4,7 +4,6 @@ import { useCallback, useState } from "react";
 import type { AnalysisResult } from "@evm-safety/core";
 import { CHAINS } from "./lib/chains";
 import type { InputMode, TxFields } from "./lib/types";
-import { shortAddr } from "./lib/format";
 import { TopBar } from "./components/TopBar";
 import { NetworkStrip } from "./components/NetworkStrip";
 import { Panel } from "./components/Panel";
@@ -16,6 +15,7 @@ import { ScoreBadge } from "./components/ScoreBadge";
 import { SeverityBadge } from "./components/SeverityBadge";
 import { CallTree } from "./components/CallTree";
 import { SimulationPanel } from "./components/SimulationPanel";
+import { ActivityPanel } from "./components/ActivityPanel";
 import { LoadingState } from "./components/LoadingState";
 
 /* ──────────────────────────────────────────── */
@@ -209,82 +209,6 @@ export default function Home() {
                             >
                                 <SimulationPanel simulation={result.simulation} />
 
-                                {result.simulation.balanceChanges.length > 0 && (
-                                    <div>
-                                        <div className="section-label">Balance Changes</div>
-                                        {result.simulation.balanceChanges.map((bc, i) => (
-                                            <div key={i} className="balance-row">
-                                                <span className="monospace text-secondary">
-                                                    {shortAddr(bc.address)}
-                                                </span>
-                                                <span className="balance-delta" style={{
-                                                    color: bc.direction === "in" ? "var(--pos)" : "var(--neg)"
-                                                }}>
-                                                    {bc.direction === "in" ? "↑" : "↓"} {bc.delta} {bc.token}
-                                                </span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-
-                                {result.simulation.approvals.length > 0 && (
-                                    <div>
-                                        <div className="section-label">Approvals</div>
-                                        {result.simulation.approvals.map((approval, i) => (
-                                            <div key={i} className="balance-row">
-                                                <span className="monospace text-secondary">
-                                                    {shortAddr(approval.owner)} → {shortAddr(approval.spender)}
-                                                </span>
-                                                <span className="balance-delta" style={{ color: "var(--warn)" }}>
-                                                    {approval.kind === "all"
-                                                        ? (approval.approved ? "all NFTs" : "revoked")
-                                                        : `${approval.amount ?? "?"} ${approval.token}`}
-                                                </span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-
-                                {result.simulation.stateChanges.length > 0 && (
-                                    <div>
-                                        <div className="section-label">State Changes ({result.simulation.stateChanges.length})</div>
-                                        {result.simulation.stateChanges.slice(0, 20).map((change, i) => (
-                                            <div key={i} className="state-row">
-                                                <span className="monospace text-secondary">{shortAddr(change.address)}</span>
-                                                <span className="badge badge-blue">{change.kind}</span>
-                                                <span className="monospace state-value">
-                                                    {change.key ? `${shortAddr(change.key)}: ` : ""}
-                                                    {change.before ? `${shortAddr(change.before)} → ` : ""}
-                                                    {shortAddr(change.after ?? "")}
-                                                </span>
-                                            </div>
-                                        ))}
-                                        {result.simulation.stateChanges.length > 20 && (
-                                            <p className="field-hint">Showing 20 of {result.simulation.stateChanges.length}. Use the API or CLI --json for all.</p>
-                                        )}
-                                    </div>
-                                )}
-
-                                {result.simulation.events.length > 0 && (
-                                    <div>
-                                        <div className="section-label">Emitted Events</div>
-                                        <div className="events-list">
-                                            {result.simulation.events.slice(0, 30).map((ev, i) => (
-                                                <div key={i} className="event-item">
-                                                    <div className="event-name">
-                                                        {ev.name} <span className="text-muted">· {shortAddr(ev.address)}</span>
-                                                    </div>
-                                                    {Object.entries(ev.params).map(([k, v]) => (
-                                                        <div key={k} className="event-param">
-                                                            {k}: <span>{v}</span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
                                 {result.simulation.notes.length > 0 && (
                                     <div>
                                         <div className="section-label">Backend Notes</div>
@@ -294,6 +218,21 @@ export default function Home() {
                                     </div>
                                 )}
                             </Panel>
+
+                            {/* ── 06 BALANCES, APPROVALS, STATE, EVENTS ── */}
+                            {(result.simulation.balanceChanges.length > 0 ||
+                                result.simulation.approvals.length > 0 ||
+                                result.simulation.stateChanges.length > 0 ||
+                                result.simulation.events.length > 0) && (
+                                <Panel
+                                    num="06"
+                                    title="Balances, Approvals, State, Events"
+                                    id="panel-activity"
+                                    className="panel-span-2"
+                                >
+                                    <ActivityPanel simulation={result.simulation} />
+                                </Panel>
+                            )}
 
                             {/* ── 07 SAFETY REPORT ── */}
                             <Panel num="07" title="Safety Report" id="panel-safety">

@@ -1464,7 +1464,10 @@ a {
 
 /* ── UTILITY ────────────────────────────────────────────────── */
 .monospace { font-family: inherit; }
-.text-red { color: var(--neg); }
+.text-red,
+.text-neg { color: var(--neg); }
+.text-pos { color: var(--pos); }
+.text-warn { color: var(--warn); }
 .text-muted { color: var(--text-muted); }
 .text-secondary { color: var(--text-muted); }
 .flex { display: flex; }
