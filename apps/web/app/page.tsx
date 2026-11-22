@@ -142,7 +142,7 @@ export default function Home() {
                 <div id="results" className="grid" tabIndex={-1}>
 
                     {/* ── 01 TRANSACTION INPUT ── */}
-                    <Panel num="01" title="Transaction Input" id="panel-input" className="panel-span-2">
+                    <Panel num="01" title="Transaction Input" id="panel-input" className="panel-full">
                         <InputPanel
                             mode={mode}
                             onModeChange={setMode}
@@ -167,12 +167,12 @@ export default function Home() {
                     </Panel>
 
                     {!result && !loading && !error && (
-                        <div className="panel-span-2 empty-hint">Enter a transaction to analyze</div>
+                        <div className="panel-full empty-hint">Enter a transaction to analyze</div>
                     )}
 
                     {/* ── ERROR ── */}
                     {error && !loading && (
-                        <div className="panel-span-2">
+                        <div className="panel-full">
                             <div className="error-box" role="alert">
                                 <span className="error-icon" aria-hidden="true">
                                     <TriangleAlert size={16} strokeWidth={1.5} />
@@ -190,7 +190,7 @@ export default function Home() {
 
                     {/* ── LOADING ── */}
                     {loading && (
-                        <div className="panel-span-2">
+                        <div className="panel-full">
                             <LoadingState step={loadStep} />
                         </div>
                     )}
@@ -199,7 +199,7 @@ export default function Home() {
                     {result && !loading && (
                         <>
                             {/* ── 02 VERDICT ── */}
-                            <Panel num="02" title="Verdict" id="panel-verdict" className="panel-span-2">
+                            <Panel num="02" title="Verdict" id="panel-verdict" className="panel-full">
                                 <VerdictPanel result={result} />
                             </Panel>
 
@@ -239,19 +239,19 @@ export default function Home() {
                                     num="06"
                                     title="Balances, Approvals, State, Events"
                                     id="panel-activity"
-                                    className="panel-span-2"
+                                    className="panel-full"
                                 >
                                     <ActivityPanel simulation={result.simulation} />
                                 </Panel>
                             )}
 
                             {/* ── 07 SAFETY REPORT ── */}
-                            <Panel num="07" title="Safety Report" id="panel-safety">
+                            <Panel num="07" title="Safety Report" id="panel-safety" className="panel-full">
                                 <SafetyPanel safety={result.safety} />
                             </Panel>
 
                             {/* ── 08 BACKEND LOG ── */}
-                            <Panel num="08" title="Backend Log" id="panel-backend" className="panel-span-2">
+                            <Panel num="08" title="Backend Log" id="panel-backend" className="panel-full">
                                 <BackendLogPanel simulation={result.simulation} />
                             </Panel>
                         </>
