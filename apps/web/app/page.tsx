@@ -11,8 +11,7 @@ import { InputPanel } from "./components/InputPanel";
 import { VerdictPanel } from "./components/VerdictPanel";
 import { DecodedPanel } from "./components/DecodedPanel";
 import { FunctionKeyBar } from "./components/FunctionKeyBar";
-import { ScoreBadge } from "./components/ScoreBadge";
-import { SeverityBadge } from "./components/SeverityBadge";
+import { SafetyPanel } from "./components/SafetyPanel";
 import { CallTree } from "./components/CallTree";
 import { SimulationPanel } from "./components/SimulationPanel";
 import { ActivityPanel } from "./components/ActivityPanel";
@@ -236,56 +235,7 @@ export default function Home() {
 
                             {/* ── 07 SAFETY REPORT ── */}
                             <Panel num="07" title="Safety Report" id="panel-safety">
-                                <div className={`score-banner score-${result.safety.score.toLowerCase()}`}>
-                                    <div className="score-line" />
-                                    <div>
-                                        <div className="score-label-text">
-                                            {result.safety.score === "SAFE" && "✓ All checks passed"}
-                                            {result.safety.score === "WARNINGS" && `⚠ ${result.safety.warnings.length} warning${result.safety.warnings.length > 1 ? "s" : ""} found`}
-                                            {result.safety.score === "DANGEROUS" && `🚨 ${result.safety.warnings.length} critical issue${result.safety.warnings.length > 1 ? "s" : ""} detected`}
-                                        </div>
-                                        <div className="score-sub">
-                                            {result.safety.score === "SAFE"
-                                                ? "This transaction looks safe to send."
-                                                : "Review the warnings below before signing."}
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="risk-score">Risk {result.safety.riskScore}/100</span>
-                                        <ScoreBadge score={result.safety.score} />
-                                    </div>
-                                </div>
-
-                                {result.safety.warnings.map((w, i) => (
-                                    <div
-                                        key={i}
-                                        className={`warning-item severity-${w.severity.toLowerCase()}`}
-                                    >
-                                        <div className="warning-header">
-                                            <SeverityBadge s={w.severity} />
-                                            <span className="warning-rule">{w.rule}</span>
-                                            <span className="badge badge-blue">{w.confidence}</span>
-                                        </div>
-                                        <p className="warning-message">{w.message}</p>
-                                        <p className="warning-rec">
-                                            <span aria-hidden="true">💡</span>
-                                            {w.recommendation}
-                                        </p>
-                                        {w.evidence && Object.keys(w.evidence).length > 0 && (
-                                            <details className="warning-evidence">
-                                                <summary>Evidence</summary>
-                                                <pre>{JSON.stringify(w.evidence, null, 2)}</pre>
-                                            </details>
-                                        )}
-                                    </div>
-                                ))}
-
-                                {result.safety.warnings.length === 0 && (
-                                    <div className="text-muted">
-                                        <div aria-hidden="true">✅</div>
-                                        No warnings — transaction appears safe to proceed.
-                                    </div>
-                                )}
+                                <SafetyPanel safety={result.safety} />
                             </Panel>
                         </>
                     )}
