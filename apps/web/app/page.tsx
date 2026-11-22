@@ -95,6 +95,12 @@ export default function Home() {
     const statusInput =
         mode === "hash" ? txHash : mode === "hex" ? rawHex : fields.to || fields.data;
 
+    const liveMessage = loading
+        ? "Analyzing transaction."
+        : result
+            ? `Analysis complete. Verdict ${result.safety.score}. ${result.safety.warnings.length} warning${result.safety.warnings.length === 1 ? "" : "s"}.`
+            : "";
+
     const focusInput = useCallback(() => {
         document.querySelector<HTMLElement>("#panel-input [data-first-field]")?.focus();
     }, []);
@@ -130,7 +136,10 @@ export default function Home() {
             <NetworkStrip chains={CHAINS} chainId={chainId} onSelect={handleChainChange} />
 
             <main className="page-wrap">
-                <div id="results" className="grid">
+                <div className="sr-only" role="status" aria-live="polite">
+                    {liveMessage}
+                </div>
+                <div id="results" className="grid" tabIndex={-1}>
 
                     {/* ── 01 TRANSACTION INPUT ── */}
                     <Panel num="01" title="Transaction Input" id="panel-input" className="panel-span-2">
@@ -156,6 +165,10 @@ export default function Home() {
                             compact={!!result}
                         />
                     </Panel>
+
+                    {!result && !loading && !error && (
+                        <div className="panel-span-2 empty-hint">Enter a transaction to analyze</div>
+                    )}
 
                     {/* ── ERROR ── */}
                     {error && !loading && (

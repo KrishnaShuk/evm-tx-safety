@@ -37,7 +37,7 @@ export function TopBar({
             <div className="brand">EVMTX SAFETY</div>
             <div className="cmdline" aria-label="Current analysis context">
                 <span className="cmd-prefix" aria-hidden="true">CMD&gt;</span>
-                <span className="cmd-text">
+                <span className="cmd-text" title={input || undefined}>
                     MODE={mode.toUpperCase()} · TX={shown} · NET={chainName}
                 </span>
             </div>

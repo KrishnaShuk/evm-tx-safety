@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { AnalysisResult } from "@evm-safety/core";
+import { TriangleAlert } from "lucide-react";
 import { shortAddr } from "../lib/format";
 import { CopyButton } from "./CopyButton";
 import { ConfidenceBadge } from "./ConfidenceBadge";
@@ -63,7 +64,10 @@ export function DecodedPanel({ decoded }: { decoded: AnalysisResult["decoded"] }
                                         <td>{p.type}</td>
                                         <td>
                                             {p.value.includes("MAX_UINT256") ? (
-                                                <span className="max-uint-warn">⚠ {p.value}</span>
+                                                <span className="max-uint-warn">
+                                                    <TriangleAlert size={16} strokeWidth={1.5} aria-hidden="true" />
+                                                    {p.value}
+                                                </span>
                                             ) : p.value}
                                         </td>
                                     </tr>

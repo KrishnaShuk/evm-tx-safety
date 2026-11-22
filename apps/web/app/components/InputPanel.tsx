@@ -1,8 +1,11 @@
 "use client";
 
+import type { KeyboardEvent } from "react";
 import { Hourglass, Search } from "lucide-react";
 import type { Chain } from "../lib/chains";
 import type { InputMode, TxFields } from "../lib/types";
+
+const TAB_ORDER: InputMode[] = ["hash", "hex", "fields"];
 
 export function InputPanel({
     mode,
@@ -47,9 +50,30 @@ export function InputPanel({
 }) {
     const selectedChain = chains.find((chain) => chain.id === chainId) ?? chains[0];
 
+    function handleTabsKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+        const current = TAB_ORDER.indexOf(mode);
+        let next: InputMode | null = null;
+
+        if (event.key === "ArrowRight") next = TAB_ORDER[(current + 1) % TAB_ORDER.length];
+        else if (event.key === "ArrowLeft") next = TAB_ORDER[(current - 1 + TAB_ORDER.length) % TAB_ORDER.length];
+        else if (event.key === "Home") next = TAB_ORDER[0];
+        else if (event.key === "End") next = TAB_ORDER[TAB_ORDER.length - 1];
+
+        if (!next) return;
+        event.preventDefault();
+        onModeChange(next);
+        document.getElementById(`tab-${next}`)?.focus();
+    }
+
     return (
         <div className="input-panel" data-compact={compact ? "true" : "false"}>
-            <div className="tabs" role="tablist" aria-label="Transaction input mode">
+            <div
+                className="tabs"
+                role="tablist"
+                aria-label="Transaction input mode"
+                aria-orientation="horizontal"
+                onKeyDown={handleTabsKeyDown}
+            >
                 <button
                     type="button"
                     role="tab"
