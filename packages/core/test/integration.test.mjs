@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import http from "node:http";
 import { ethers, Interface } from "ethers";
-import { analyzeTx, assertSafeRpcUrl } from "../dist/index.js";
+import { analyzeTx, assertSafeRpcUrl, defaultRpcForChain } from "../dist/index.js";
 import { ERC20_ABI } from "../dist/abi/abis.js";
 
 const USDC = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
@@ -249,8 +249,9 @@ test("RPC URL policy blocks private hosts and allows the default registry", asyn
     process.env.ALLOW_CUSTOM_RPC = "false";
     try {
         await assert.rejects(() => assertSafeRpcUrl("http://127.0.0.1:8545", 1), /private|link-local/i);
-        const allowed = await assertSafeRpcUrl("https://eth.llamarpc.com", 1);
-        assert.match(allowed, /llamarpc/);
+        const defaultRpc = defaultRpcForChain(1);
+        const allowed = await assertSafeRpcUrl(defaultRpc, 1);
+        assert.equal(new URL(allowed).hostname, new URL(defaultRpc).hostname);
     } finally {
         if (previousHttp === undefined) delete process.env.ALLOW_HTTP_RPC;
         else process.env.ALLOW_HTTP_RPC = previousHttp;

@@ -5,8 +5,8 @@ import type { AnalysisResult } from "@evm-safety/core";
 
 /* ──────────────────────────────────────────── */
 const CHAINS = [
-    { id: 1, name: "Ethereum Mainnet", rpc: "https://eth.llamarpc.com", color: "#627eea", symbol: "ETH" },
-    { id: 137, name: "Polygon", rpc: "https://polygon.llamarpc.com", color: "#8247e5", symbol: "MATIC" },
+    { id: 1, name: "Ethereum Mainnet", rpc: "https://ethereum-rpc.publicnode.com", color: "#627eea", symbol: "ETH" },
+    { id: 137, name: "Polygon", rpc: "https://polygon-bor-rpc.publicnode.com", color: "#8247e5", symbol: "MATIC" },
     { id: 42161, name: "Arbitrum One", rpc: "https://arb1.arbitrum.io/rpc", color: "#12aaff", symbol: "ARB" },
     { id: 8453, name: "Base", rpc: "https://mainnet.base.org", color: "#0052ff", symbol: "BASE" },
     { id: 10, name: "Optimism", rpc: "https://mainnet.optimism.io", color: "#ff0420", symbol: "OP" },

@@ -46,7 +46,7 @@ const CHAINS: Record<number, ChainConfig> = {
         shortName: "ethereum",
         nativeSymbol: "ETH",
         nativeDecimals: 18,
-        rpc: "https://eth.llamarpc.com",
+        rpc: "https://ethereum-rpc.publicnode.com",
         explorer: "https://etherscan.io",
         knownContracts: {
             [token("0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", "USDC", 6, "USD Coin").address]: token("0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", "USDC", 6, "USD Coin"),
@@ -163,7 +163,7 @@ const CHAINS: Record<number, ChainConfig> = {
         shortName: "polygon",
         nativeSymbol: "MATIC",
         nativeDecimals: 18,
-        rpc: "https://polygon.llamarpc.com",
+        rpc: "https://polygon-bor-rpc.publicnode.com",
         explorer: "https://polygonscan.com",
         knownContracts: {
             [token("0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270", "WMATIC", 18, "Wrapped Matic").address]: token("0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270", "WMATIC", 18, "Wrapped Matic"),

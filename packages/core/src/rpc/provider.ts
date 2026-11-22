@@ -10,7 +10,7 @@ export interface ProviderOptions {
 export function createProvider(rpcUrl: string, chainId: number): Provider {
     return new JsonRpcProvider(rpcUrl, chainId, {
         staticNetwork: true,
-        batchMaxCount: 10,
+        batchMaxCount: 3,
     });
 }
 
