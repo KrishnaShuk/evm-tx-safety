@@ -1,24 +1,43 @@
-export function GasBar({ used, limit }: { used: number; limit: number }) {
-    const pct = Math.min(100, Math.round((used / limit) * 100));
-    const grad = pct > 85
-        ? "linear-gradient(90deg, #ef4444, #f87171)"
-        : pct > 60
-            ? "linear-gradient(90deg, #f59e0b, #fbbf24)"
-            : "linear-gradient(90deg, #10b981, #34d399)";
-    const chipColor = pct > 85 ? "var(--red-2)" : pct > 60 ? "var(--amber-2)" : "var(--green-2)";
+import type { AnalysisResult } from "@evm-safety/core";
+
+export function GasBar({
+    used,
+    limit,
+    status,
+}: {
+    used: number;
+    limit: number;
+    status?: AnalysisResult["simulation"]["status"];
+}) {
+    const ratio = limit > 0 ? used / limit : 0;
+    const pct = Math.round(ratio * 100);
+    const over = limit > 0 && used > limit;
+    const failed = status === "revert";
+    const near = ratio >= 0.85;
+
+    const tone = over || failed ? "is-neg" : near ? "is-warn" : "is-info";
+    const filled = ratio <= 0 ? 0 : Math.min(10, Math.max(1, Math.ceil(ratio * 10)));
 
     return (
         <div>
             <div className="gas-meta">
-                <span className="text-secondary" style={{ fontSize: 12, fontFamily: "'JetBrains Mono',monospace" }}>
+                <span className="text-secondary">
                     {used.toLocaleString()} / {limit.toLocaleString()} gas
                 </span>
-                <span className="gas-pct-chip" style={{ color: chipColor, background: `${chipColor}18`, border: `1px solid ${chipColor}44` }}>
-                    {pct}%
-                </span>
+                <span className="gas-pct-chip">{pct}%</span>
             </div>
-            <div className="gas-bar-wrap">
-                <div className="gas-bar-fill" style={{ width: `${pct}%`, background: grad }} />
+            <div
+                className={`meter ${tone}`}
+                role="img"
+                aria-label={`Gas used ${used} of ${limit}, ${pct} percent`}
+            >
+                {Array.from({ length: 10 }).map((_, i) => (
+                    <span
+                        key={i}
+                        className={`meter-seg ${i < filled ? "on" : ""}`}
+                        aria-hidden="true"
+                    />
+                ))}
             </div>
         </div>
     );

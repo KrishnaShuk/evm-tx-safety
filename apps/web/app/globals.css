@@ -1235,8 +1235,8 @@ a {
 
 /* ── CAPABILITY GRID ────────────────────────────────────────── */
 .capability-row {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: var(--s2);
     margin-bottom: var(--s2);
 }

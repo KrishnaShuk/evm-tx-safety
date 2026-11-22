@@ -15,8 +15,7 @@ import { FunctionKeyBar } from "./components/FunctionKeyBar";
 import { ScoreBadge } from "./components/ScoreBadge";
 import { SeverityBadge } from "./components/SeverityBadge";
 import { CallTree } from "./components/CallTree";
-import { CapabilityChips } from "./components/CapabilityChips";
-import { GasBar } from "./components/GasBar";
+import { SimulationPanel } from "./components/SimulationPanel";
 import { LoadingState } from "./components/LoadingState";
 
 /* ──────────────────────────────────────────── */
@@ -208,38 +207,7 @@ export default function Home() {
                                 id="panel-simulation"
                                 right={<span className="badge badge-indigo">{result.simulation.backend}</span>}
                             >
-                                <div className={`sim-status-pill ${result.simulation.status === "success" ? "success" : result.simulation.status === "revert" ? "fail" : "unavailable"}`}>
-                                    <span aria-hidden="true">
-                                        {result.simulation.status === "success" ? "✅" : result.simulation.status === "revert" ? "❌" : "⚠"}
-                                    </span>
-                                    {result.simulation.status === "success" && "Transaction will succeed"}
-                                    {result.simulation.status === "revert" && "Transaction will revert"}
-                                    {result.simulation.status === "unavailable" && "Execution could not be simulated"}
-                                </div>
-
-                                {result.simulation.status === "revert" && result.simulation.revertReason && (
-                                    <div className="revert-box">
-                                        <div className="revert-label">Revert Reason</div>
-                                        <p className="text-secondary">{result.simulation.revertReason}</p>
-                                    </div>
-                                )}
-
-                                {result.simulation.status === "unavailable" && result.simulation.error && (
-                                    <div className="revert-box is-warn">
-                                        <div className="revert-label">{result.simulation.error.code}</div>
-                                        <p className="text-secondary">{result.simulation.error.message}</p>
-                                    </div>
-                                )}
-
-                                <div className="section-label">Simulation Coverage</div>
-                                <CapabilityChips capabilities={result.simulation.capabilities} />
-
-                                {result.simulation.status !== "unavailable" && (
-                                    <>
-                                        <div className="section-label">Gas Usage</div>
-                                        <GasBar used={result.simulation.gasUsed} limit={result.simulation.gasLimit} />
-                                    </>
-                                )}
+                                <SimulationPanel simulation={result.simulation} />
 
                                 {result.simulation.balanceChanges.length > 0 && (
                                     <div>
